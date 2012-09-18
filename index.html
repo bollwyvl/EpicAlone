@@ -1,0 +1,66 @@
+<html>
+	<head>
+		<title>Offline Markdown Editor</title>
+		<script src="epiceditor/epiceditor/js/epiceditor.min.js"></script>
+		<style type="text/css">
+			*{font-family: "Gill Sans MT"}
+			#dropbox{color:#fff; background-color:#333; padding:5px;}
+		</style>
+	</head>
+	<body>
+		<h1>Edit your markdown here</h1>
+		<p>The last thing you were editing will be saved... but you probably shouldn't rely on this!</p>
+		<span id="dropbox">Drag a file here to load it</span>
+		<div id="epiceditor"></div>
+		<div style="float:right;">Try it in full-screen for live preview!&uarr;</div>
+        <div id="ver">Standalone EpicEditor (built with v<span id="ver-num"></span>)</div>
+		<script type="text/javascript">
+            function byId(sel){
+                return document.getElementById(sel);
+            }
+        
+			var opts = {
+                    basePath: 'epiceditor/epiceditor'
+                },
+                editor = new EpicEditor(opts).load(),
+				dropbox;
+                
+            byId("ver-num").innerHTML = EpicEditor.version;
+            
+			dropbox = byId("dropbox");
+			dropbox.addEventListener("dragenter", dragenter, false);
+			dropbox.addEventListener("dragover", dragover, false);
+			dropbox.addEventListener("drop", drop, false);
+			
+			
+			function dragenter(e) {
+			  e.stopPropagation();
+			  e.preventDefault();
+			}
+
+			function dragover(e) {
+			  e.stopPropagation();
+			  e.preventDefault();
+			}
+			
+			function drop(e) {
+			  e.stopPropagation();
+			  e.preventDefault();
+
+			  var dt = e.dataTransfer;
+			  var files = dt.files;
+
+			  handleFiles(files);
+			}
+			
+			function handleFiles(files){
+				var reader = new FileReader();
+				reader.onload = function(evt) {
+					console.log(evt.target.result);
+				};
+				reader.readAsText(files[0]);
+				
+			}
+		</script>
+	</body>
+</html>
