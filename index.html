@@ -1,40 +1,64 @@
 <html>
 	<head>
 		<title>Offline Markdown Editor</title>
-		<script src="epiceditor/epiceditor/js/epiceditor.min.js"></script>
-		<script src="marked/lib/marked.js"></script>
 		<style type="text/css">
 			*{font-family: "Gill Sans MT"}
-			#dropbox{color:#fff; background-color:#333; padding:5px;}
 		</style>
 	</head>
 	<body>
-		<h1>Edit your markdown here</h1>
-		<p>The last thing you were editing will be saved... but you probably shouldn't rely on this!</p>
-		<span id="dropbox">Drag a file here to load it</span>
+		<p>
+            The last thing you were editing will be saved... but you probably
+            shouldn't rely on this! Drag a file to this window to edit it in markdown!
+            <a href="#" id="dragout" download="epic.md">Chrome only: Drag this out of your browser to download the current file.</a>
+        </p>
 		<div id="epiceditor"></div>
 		<div style="float:right;">Try it in full-screen for live preview!&uarr;</div>
         <div id="ver">Standalone EpicEditor (built with v<span id="ver-num"></span>)</div>
+		<script src="epiceditor/epiceditor/js/epiceditor.min.js"></script>
+		<script src="marked/lib/marked.js"></script>
+		<script src="base64.js"></script>
 		<script type="text/javascript">
             function byId(sel){
                 return document.getElementById(sel);
             }
         
+            marked.setOptions({
+              gfm: true,
+              pedantic: true,
+              sanitize: true,
+              anchors: true
+            });
+        
 			var opts = {
                     basePath: 'epiceditor/epiceditor',
-                    parser: marked,
+                    parser: marked
                 },
-                editor = new EpicEditor(opts).load(),
-				dropbox;
+                editor = new EpicEditor(opts).load();
                 
             byId("ver-num").innerHTML = EpicEditor.version;
             
-			dropbox.addEventListener("dragenter", dragenter, false);
-			dropbox = byId("dropbox");
-			dropbox.addEventListener("dragover", dragover, false);
-			dropbox.addEventListener("drop", drop, false);
+			document.addEventListener("dragenter", dragenter, false);
+			document.addEventListener("dragover", dragover, false);
+			document.addEventListener("drop", drop, false);
 			
-			
+			byId("dragout").addEventListener("dragstart", function(evt){
+                var file = editor.getFiles("epiceditor"),
+                    bad_rex = RegExp("[: ,]+", "g"),
+                    txt = file.content,
+                    date = new Date(file.modified),
+                    fname = date.toLocaleDateString() + " " + date.toLocaleTimeString() + ".md"
+                    details = [
+                        "text/plain",
+                        fname.replace(bad_rex,"."),
+                        "data:text/plain;base64," + Base64.encode(txt)
+                    ].join(":");
+                
+                console.log(fname.replace(":","."))
+                
+                evt.dataTransfer.setData("DownloadURL", details);
+            }, false);
+            
+            
 			function dragenter(e) {
 			  e.stopPropagation();
 			  e.preventDefault();
@@ -58,7 +82,7 @@
 			function handleFiles(files){
 				var reader = new FileReader();
 				reader.onload = function(evt) {
-					console.log(evt.target.result);
+                    editor.importFile(undefined, evt.target.result);
 				};
 				reader.readAsText(files[0]);
 				
