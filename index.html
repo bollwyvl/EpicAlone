@@ -2,6 +2,7 @@
 	<head>
 		<title>Offline Markdown Editor</title>
 		<script src="epiceditor/epiceditor/js/epiceditor.min.js"></script>
+		<script src="marked/lib/marked.js"></script>
 		<style type="text/css">
 			*{font-family: "Gill Sans MT"}
 			#dropbox{color:#fff; background-color:#333; padding:5px;}
@@ -20,15 +21,16 @@
             }
         
 			var opts = {
-                    basePath: 'epiceditor/epiceditor'
+                    basePath: 'epiceditor/epiceditor',
+                    parser: marked,
                 },
                 editor = new EpicEditor(opts).load(),
 				dropbox;
                 
             byId("ver-num").innerHTML = EpicEditor.version;
             
-			dropbox = byId("dropbox");
 			dropbox.addEventListener("dragenter", dragenter, false);
+			dropbox = byId("dropbox");
 			dropbox.addEventListener("dragover", dragover, false);
 			dropbox.addEventListener("drop", drop, false);
 			

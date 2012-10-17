@@ -1,0 +1,6 @@
+[submodule "marked"]
+	path = marked
+	url = git://github.com/chjj/marked.git
+[submodule "epiceditor"]
+	path = epiceditor
+	url = https://github.com/OscarGodson/EpicEditor.git
